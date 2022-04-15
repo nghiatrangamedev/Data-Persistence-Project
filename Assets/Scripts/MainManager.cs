@@ -10,6 +10,13 @@ public class MainManager : MonoBehaviour
     public int LineCount = 6;
     public Rigidbody Ball;
 
+    // Tạo ra 1 biến để lưu High Score
+    public float highScore = 0;
+
+    // Tạo ra 1 biến để nhận Component Text từ GameObject ScoreText
+    [SerializeField] Text highScoreText;
+    private string bestPlayer;
+
     public Text ScoreText;
     public GameObject GameOverText;
     
@@ -18,7 +25,13 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
+    // Hiển thị tên người chơi ngay khi trò chơi bắt đầu
+    private void Awake()
+    {
+        //DisplayName();
+        DisplayHighScore();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -72,5 +85,38 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        // Nếu điểm hiện tại lớn hơn high score thì lưu high score lại
+        // Sau khi người chơi bắt đầu lại thì sẽ hiển thị high score mới
+        if (m_Points > highScore)
+        {
+            bestPlayer = SaveData.Instance.playerName;
+            // Lưu high score ra 1 game object nằm trong DontDestroyOnLoad để giữ liệu không bị mất
+            SaveData.Instance.SaveHighScore(bestPlayer,m_Points);
+        }
     }
+
+    // Hiển thị tên mà người chơi đã nhập vào từ Menu Scene
+    /* public void DisplayName()
+    {
+        // Nhận tên người chơi đã nhập từ Menu Scene
+        playerName = SaveData.Instance.LoadName();
+        // Kiểm tra xem người chơi có nhập tên hay không
+        // Nếu có thì sẽ hiển thị tên người chơi lên trên màn hình
+        if (playerName != null)
+        {
+            highScoreText.text = "Score: " + playerName + " : 0 ";
+        }
+        // Nếu không có thì sẽ không làm gì cả
+    }
+    */
+    public void DisplayHighScore()
+    {
+        // Load high score được lưu từ trước vào high score hiện tại để hiển thị lên UI
+        SaveData.Instance.LoadHighScore();
+        highScore = SaveData.Instance.bestScore;
+        bestPlayer = SaveData.Instance.bestPlayer;
+        highScoreText.text = "Score: " + bestPlayer + " : " + highScore;
+    }
+
 }
